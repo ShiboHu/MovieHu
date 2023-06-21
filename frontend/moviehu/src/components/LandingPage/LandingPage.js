@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import './LandingPage.css'
 
+const apiKey = process.env.TMDB_API_KEY;
 
 function LandingPage(){ 
     const [data, setData] = useState('');
@@ -16,7 +17,7 @@ function LandingPage(){
             method: 'GET',
             headers: {
               accept: 'application/json',
-              Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2OWI4ZDY0OTMyNzBhNGJmMDc1YjM3YTlmNmFlNzA4NiIsInN1YiI6IjY0OTMxOTlkNzA2ZTU2MDBlM2VlZDdiYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.BQqj1GO3lCcsUPIMCZ2ACl-JcyURQ6K_-37TY9ydwhM'
+              Authorization: `Bearer ${apiKey}`
             }
           };
           
@@ -72,7 +73,7 @@ function LandingPage(){
                     <img className="landingpage-movieimage" alt="movie" src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
                     <div className="landingpage-movieinfo">
                       <li className="landingpage-movietitle" title={movie.title}>
-                        {truncateTitle(movie.title, 10)}
+                        {truncateTitle(movie.title, 60)}
                       </li>
                       <li>{movie.release_date}</li>
                     </div>
