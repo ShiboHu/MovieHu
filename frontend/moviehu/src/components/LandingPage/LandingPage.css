@@ -41,6 +41,7 @@
   transform: scale(1.2);
 }
 
+
 .landingpage-movieinfo {
   flex: 1;
 }
@@ -66,6 +67,3 @@
 .landingpage-button:hover {
   background-color: #555;
 }
-
-
-
