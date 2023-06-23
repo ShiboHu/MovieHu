@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "render-postbuild": "npm run build --prefix frontend",
-    "install": "npm --prefix frontend install frontend"
+    "install": "npm --prefix frontend install frontend",
+    "start": "npm start --prefix backend",
+    "build": "npm run build --prefix backend"
   },
   "repository": {
     "type": "git",
