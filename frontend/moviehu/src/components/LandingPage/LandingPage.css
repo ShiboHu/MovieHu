@@ -69,4 +69,44 @@
   background-color: #555;
 }
 
+.search-bar {
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
 
+.search-bar form {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input[type="text"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 300px;
+}
+
+.search-bar button {
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+.search-bar button:hover {
+  background-color: #45a049;
+}
+
+.tohome { 
+  display: flex;
+  gap: 400px;
+  align-items: center;
+}
+
+.fa-home { 
+  font-size: 50px;
+  cursor: pointer;
+}
