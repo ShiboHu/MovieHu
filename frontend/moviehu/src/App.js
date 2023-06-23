@@ -11,6 +11,8 @@ function App() {
 
     <Switch>
 
+    
+
       <Route exact path={'/'}>
         <LandingPage />
       </Route>

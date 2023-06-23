@@ -13,18 +13,19 @@
 }
 
 .landingpage-cardul {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-gap: 20px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-gap: 25px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
 .landingpage-moviecard {
-  background-color: #f5f5f5;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;  
+  background-color: #eeeeee;
   border-radius: 4px;
-  padding: 10px;
+  padding: 25px;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -67,3 +68,5 @@
 .landingpage-button:hover {
   background-color: #555;
 }
+
+
