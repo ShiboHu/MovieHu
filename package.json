@@ -1,0 +1,22 @@
+{
+  "name": "moviehu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "render-postbuild": "npm run build --prefix frontend",
+    "install": "npm --prefix frontend install frontend",
+    "dev:frontend": "npm install --prefix frontend start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShiboHu/MovieHu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShiboHu/MovieHu/issues"
+  },
+  "homepage": "https://github.com/ShiboHu/MovieHu#readme"
+}
