@@ -6,8 +6,8 @@
   "scripts": {
     "render-postbuild": "npm run build --prefix frontend",
     "install": "npm --prefix frontend install frontend",
-    "start": "npm start --prefix backend",
-    "build": "npm run build --prefix backend"
+    "start": "npm start --prefix frontend",
+    "build": "npm run build --prefix frontend"
   },
   "repository": {
     "type": "git",
