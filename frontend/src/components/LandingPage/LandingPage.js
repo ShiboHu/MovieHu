@@ -215,13 +215,13 @@ function LandingPage() {
                         "No overview available for this title."}
                     </p>
                     <div className="hero-buttons">
-                      <button
+                      {/* <button
                         type="button"
                         className="hero-btn-primary"
                         onClick={() => handleMovieClick(heroMovie)}
                       >
                         ▶ Play
-                      </button>
+                      </button> */}
                       <button
                         type="button"
                         className="hero-btn-secondary"
