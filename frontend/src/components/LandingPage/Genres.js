@@ -1,179 +1,214 @@
-import { useEffect, useState } from "react";
-import "./DisplayGenre.css";
-import { useHistory, useParams } from 'react-router-dom'
+import React, { useEffect, useState, useMemo } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import MovieModal from "./MovieModal";
+import { useMovieData } from "./useMovieData";
+import ThemeToggle from "./ThemeToggle";
 
 const apiKey = process.env.REACT_APP_TMDB_API_KEY;
 
-
 function DisplayGenreMovie() {
   const { genreId } = useParams();
-  const [filteredData, setFilteredData] = useState('');
+  const [filteredData, setFilteredData] = useState(null);
   const history = useHistory();
   const [page, setPage] = useState(1);
-  const [genres, setGenres] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState(null);
-  // Fetch movie genres and data
-  useEffect(() => {
-    
 
-    const filterFetchMovieByGenre = async () => { 
+  const {
+    genres,
+    showModal,
+    selectedMovie,
+    handleMovieClick,
+    closeModal,
+    truncateTitle,
+  } = useMovieData();
+
+  const apiOptions = useMemo(
+    () => ({
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+    }),
+    []
+  );
+
+  useEffect(() => {
+    const filterFetchMovieByGenre = async () => {
       try {
-        const options = {
-          method: 'GET',
-          headers: {
-            accept: 'application/json',
-            Authorization: `Bearer ${apiKey}`
-          }
-        };
-  
-        const res = await fetch(`https://api.themoviedb.org/3/discover/movie?with_genres=${genreId}&language=en-US&page=${page}`, options);
+        const url = `https://api.themoviedb.org/3/discover/movie?with_genres=${genreId}&language=en-US&page=${page}`;
+        const res = await fetch(url, apiOptions);
         const jsonData = await res.json();
         setFilteredData(jsonData);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching genre movies:", error);
+        setFilteredData(null);
       }
-    }
-    
-    
-    const fetchGenre = async () => {
-      try {
-        const options = {
-          method: "GET",
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${apiKey}`,
-          },
-        };
-        
-        const res = await fetch(
-          "https://api.themoviedb.org/3/genre/movie/list?language=en",
-          options
-          );
-          const jsonRes = await res.json();
-          setGenres(jsonRes.genres);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      
-      fetchGenre()
-      filterFetchMovieByGenre();
-    }, [page, filteredData]);
-    
-    //handle pages 
-    const handleNextPage = () => { 
-      setPage(page + 1)
-      window.scrollTo(0, 0)
-    }
-    
-    const handlePreviousPage = () => { 
-      if(page > 1){ 
-        setPage(page - 1)
-        window.scrollTo(0, 0)
-      }
-    }
-    
-    
-    // truncate the movie title
-    const truncateTitle = (title, maxLength) => {
-      if (title.length <= maxLength) {
-        return title;
-      }
-      return title.substr(0, maxLength) + '...';
-    };  
-    
-    const convertTitle = (id) => { 
-      for(let i = 0; i < genres.length; i++) { 
-        if(genres[i].id == id){ 
-          return genres[i].name
-        }
-      }
-    }
+    };
 
+    filterFetchMovieByGenre();
+  }, [page, genreId, apiOptions]);
 
-      //handle movie click
-  const handleMovieClick = async (movie) => {
-    try {
-      const options = {
-        method: "GET",
-        headers: {
-          accept: "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-      };
+  const genreName = useMemo(() => {
+    const genre = genres.find((g) => String(g.id) === genreId);
+    return genre ? genre.name : "Genre";
+  }, [genres, genreId]);
 
-      const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${movie.id}?language=en-US`,
-        options
-      );
-      const movieDetails = await res.json();
+  const handleNextPage = () => {
+    setPage((prevPage) => prevPage + 1);
+    window.scrollTo(0, 0);
+  };
 
-      setSelectedMovie(movieDetails);
-      setShowModal(true);
-    } catch (error) {
-      console.log(error);
+  const handlePreviousPage = () => {
+    if (page > 1) {
+      setPage((prevPage) => prevPage - 1);
+      window.scrollTo(0, 0);
     }
   };
 
-  // Function to close the modal
-  const closeModal = () => {
-    setShowModal(false);
-  };
-    
-    return (
-      <div className="main-container">
+  const hasResults =
+    filteredData && Array.isArray(filteredData.results);
 
-    <div >
-      <ul className="genre-list">
-       {genres.map(genre => (
-         <button onClick={() => history.push(`/genre/${genre.id}`)}>{genre.name}</button>
-       ))}
-     </ul>
-    </div>
-
-    
-
-      {filteredData ? (
-        <div className="landingpage-container">
-          <div className="tohome">
-        <i className="fas fa-home" onClick={() => history.push('/')}></i>
-            <h1 className="landingpage-title">{convertTitle(genreId)} Movies</h1>
-        <i className="fas fa-home"onClick={() => history.push('/')} ></i>
-        </div>
-          <ul className="landingpage-cardul">
-            {filteredData?.results?.map((movie) => (
-              <div key={movie.id} className="landingpage-moviecard" onClick={() => handleMovieClick(movie)}>
-                <div className="landingpage-movieinfo">
-                <img className="landingpage-movieimage" alt="movie" src={`https://image.tmdb.org/t/p/w500/${movie.poster_path}`} />
-                  <li className="landingpage-movietitle" title={movie.title}>
-                    {truncateTitle(movie.title, 13)}
-                  </li>
-                  <li>{movie.release_date}</li>
-                </div>
-              </div>
+  return (
+    <div className="genre-page">
+      {/* Top navigation with theme toggle */}
+      <nav className="genre-navigation">
+        <div className="nav-inner">
+          <ul className="genre-list" role="list">
+            {genres.map((genre) => (
+              <li key={genre.id}>
+                <button
+                  className={`genre-button ${
+                    String(genre.id) === genreId ? "active" : ""
+                  }`}
+                  onClick={() => {
+                    history.push(`/genre/${genre.id}`);
+                    setPage(1);
+                    setFilteredData(null);
+                  }}
+                >
+                  {genre.name}
+                </button>
+              </li>
             ))}
           </ul>
-          <div className="landingpage-buttons">
-            <button className="landingpage-button" onClick={handlePreviousPage}>Previous</button>
-            <button className="landingpage-button" onClick={handleNextPage}>Next</button>
-          </div>
+          <ThemeToggle />
+        </div>
+      </nav>
+
+      {hasResults ? (
+        <div className="main-content-area">
+          {/* Header */}
+          <header className="page-header fade-in">
+            <i
+              className="fas fa-home home-icon"
+              onClick={() => history.push("/")}
+              role="button"
+              aria-label="Go to Home"
+            />
+            <h1 className="page-title">{genreName} Movies</h1>
+            <i
+              className="fas fa-home home-icon"
+              onClick={() => history.push("/")}
+              role="button"
+              aria-label="Go to Home"
+            />
+          </header>
+
+          {/* Movie Grid */}
+          <ul className="movie-grid" role="list">
+            {filteredData.results.map((movie) => (
+              <li
+                key={movie.id}
+                className="movie-card fade-in"
+                onClick={() => handleMovieClick(movie)}
+                role="button"
+                tabIndex="0"
+                aria-label={`View details for ${movie.title}`}
+              >
+                <img
+                  className="movie-poster"
+                  alt={`${movie.title} poster`}
+                  src={
+                    movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w500/${movie.poster_path}`
+                      : "/placeholder-image.jpg"
+                  }
+                  loading="lazy"
+                />
+                <div className="movie-info-container">
+                  <h3 className="movie-title" title={movie.title}>
+                    {truncateTitle(movie.title, 18)}
+                  </h3>
+                  <p className="movie-release-date">
+                    {movie.release_date
+                      ? movie.release_date.substring(0, 4)
+                      : "N/A"}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Pagination */}
+          {filteredData.total_pages > 1 && (
+            <div className="pagination-controls">
+              <button
+                className="pagination-button"
+                onClick={handlePreviousPage}
+                disabled={page === 1}
+                aria-disabled={page === 1}
+              >
+                &larr; Previous
+              </button>
+              <span className="page-indicator">
+                Page {page} of {filteredData.total_pages}
+              </span>
+              <button
+                className="pagination-button"
+                onClick={handleNextPage}
+                disabled={page >= filteredData.total_pages}
+                aria-disabled={page >= filteredData.total_pages}
+              >
+                Next &rarr;
+              </button>
+            </div>
+          )}
         </div>
       ) : (
-        <p>Loading...</p>
+        <div className="main-content-area">
+          <header className="page-header fade-in">
+            <i
+              className="fas fa-home home-icon"
+              onClick={() => history.push("/")}
+              role="button"
+              aria-label="Go to Home"
+            />
+            <h1 className="page-title">{genreName} Movies</h1>
+            <i
+              className="fas fa-home home-icon"
+              onClick={() => history.push("/")}
+              role="button"
+              aria-label="Go to Home"
+            />
+          </header>
+
+          {/* Skeleton while loading */}
+          <div className="skeleton-grid">
+            {Array.from({ length: 8 }).map((_, idx) => (
+              <div key={idx} className="skeleton-card">
+                <div className="skeleton-poster" />
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
-{showModal && (
-        <MovieModal
-          movie={selectedMovie}
-          closeModal={closeModal}
-        />
+      {/* Modal */}
+      {showModal && selectedMovie && (
+        <MovieModal movie={selectedMovie} closeModal={closeModal} />
       )}
     </div>
   );
 }
-
-
 
 export default DisplayGenreMovie;
